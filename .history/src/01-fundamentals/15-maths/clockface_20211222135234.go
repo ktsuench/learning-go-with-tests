@@ -1,0 +1,56 @@
+package clockface
+
+import (
+	"io"
+	"math"
+	"os"
+	"time"
+)
+
+// A Point represents a two dimensional Cartesian coordinate
+type Point struct {
+	X float64
+	Y float64
+}
+
+const (
+	clockCenterX     = 150
+	clockCenterY     = 150
+	secondHandLength = 90
+)
+
+const (
+	svgStart = `<?xml version="1.0" encodin="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1/EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 300 300" version="2.0">`
+	bezel  = `<circle cx="150" cy="150" r="100" style="fill:#fff;stroke:#000;stroke-width:5px;"/>`
+	svgEnd = `</svg>`
+)
+
+func secondsInRadians(t time.Time) float64 {
+	secondRatio := float64(t.Second()) / 60
+	return (secondRatio * 360) * (math.Pi / 180)
+}
+
+func secondHandPoint(t time.Time) Point {
+	angle := secondsInRadians(t)
+	x, y := math.Sin(angle), math.Cos(angle)
+	return Point{x, y}
+}
+
+// SecondHand is the unit vector of the second hand of
+// an analogue clock at time `t` represented as a Point.
+func SecondHand(t time.Time) Point {
+	secondHand := secondHandPoint(t)
+	x := clockCenterX - secondHand.X*secondHandLength
+	y := clockCenterY - secondHand.Y*secondHandLength
+	return Point{x, y}
+}
+
+func SVGWriter(w io.Writer, t time.Time) {
+	sh := SecondHand(t)
+	io.WriteString(os.Stdout, svgStart)
+	io.WriteString(os.Stdout, bezel)
+	io.WriteString(os.Stdout, secondHandTag(sh))
+	io.WriteString(os.Stdout, svgEnd)
+}

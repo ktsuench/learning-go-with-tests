@@ -1,0 +1,34 @@
+package main
+
+import (
+	"fmt"
+	"io"
+	"time"
+)
+
+type Sleeper interface {
+	Sleep()
+}
+
+type DefaultSleeper struct{}
+
+const finalWord = "Go!"
+const countdownStart = 3
+
+func (d *DefaultSleeper) Sleep() {
+	time.Sleep(1 * time.Second)
+}
+
+func Countdown(out io.Writer, s Sleeper) {
+	for i := countdownStart; i > 0; i-- {
+		s.Sleep(1 * time.Second)
+		fmt.Fprintln(out, i)
+	}
+
+	s.Sleep(1 * time.Second)
+	fmt.Fprint(out, finalWord)
+}
+
+func main() {
+	// Countdown(os.Stdout, time)
+}
