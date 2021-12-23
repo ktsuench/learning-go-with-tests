@@ -1,10 +1,18 @@
-package clockface
+package svg
 
 import (
 	"fmt"
 	"io"
 	"math"
 	"time"
+)
+
+const (
+	svgStart = `<?xml version="1.0" encodin="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1/EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 300 300" version="2.0">`
+	bezel  = `<circle cx="150" cy="150" r="100" style="fill:#fff;stroke:#000;stroke-width:5px;"/>`
+	svgEnd = `</svg>`
 )
 
 // A Point represents a two dimensional Cartesian coordinate
@@ -20,28 +28,6 @@ const (
 	minuteHandLength = 80
 	hourHandLength   = 50
 )
-
-const (
-	svgStart = `<?xml version="1.0" encodin="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1/EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 300 300" version="2.0">`
-	bezel  = `<circle cx="150" cy="150" r="100" style="fill:#fff;stroke:#000;stroke-width:5px;"/>`
-	svgEnd = `</svg>`
-)
-
-func secondsInRadians(t time.Time) float64 {
-	return (float64(t.Second()) / 30) * math.Pi
-}
-
-func minutesInRadians(t time.Time) float64 {
-	minuteRad := (float64(t.Minute()) / 30) * math.Pi
-	return minuteRad + secondsInRadians(t)/60
-}
-
-func hoursInRadians(t time.Time) float64 {
-	hourRatio := (float64(t.Hour()) / 6) * math.Pi
-	return hourRatio + minutesInRadians(t)/12
-}
 
 func angleToPoint(angle float64) Point {
 	x, y := math.Sin(angle), math.Cos(angle)
@@ -83,7 +69,7 @@ func hourHand(w io.Writer, t time.Time) {
 	fmt.Fprintf(w, `<line x1="150" y1="150" x2="%.2f" y2="%.2f" style="fill:none;stroke:#000;stroke-width:5px;"/>`, p.X, p.Y)
 }
 
-func SVGWriter(w io.Writer, t time.Time) {
+func Write(w io.Writer, t time.Time) {
 	io.WriteString(w, svgStart)
 	io.WriteString(w, bezel)
 	secondHand(w, t)
