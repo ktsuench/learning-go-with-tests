@@ -1,0 +1,8 @@
+---
+Title: Goodbye, TDD world!
+Description: Second post on our wonderful blog
+Tags: tdd, go
+---
+Goodbye world!
+
+This is the end of fundamentals!
